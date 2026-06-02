@@ -83,9 +83,21 @@ const ru: LANG_MESSAGE = {
   updateConfigs: 'Обновить конфигурации',
   updateConfigsSuccess: 'Конфигурации успешно обновлены',
   ruleInjectionSuccess: 'В конфигурацию внедрено правил: {rules}',
+  ruleInjectionSuccessPersisted:
+    'Внедрено правил: {rules}. Ядро обновлено, файл сохранён: {path}. Не используйте Reload configs до сохранения.',
+  ruleInjectionSuccessDownload:
+    'Внедрено правил: {rules} в память ядра. YAML на диске не изменён; скачан {path} — замените основной конфиг.',
+  ruleInjectionVerifyFailed:
+    'Конфиг отправлен, но inline-правила не найдены. Проверьте PUT /configs и не делайте Reload configs сразу после внедрения.',
   ruleInjectionNoData:
     'Нет правил для внедрения (config: {hasClashConfig}, userProxy: {userProxyCount}, AWAvenue: {awAvenueCount}). Обновите injection/ и пересоберите панель.',
   ruleInjectionFailed: 'Ошибка внедрения правил: {message}',
+  ruleInjectionSettings: 'Внедрение правил',
+  ruleInjectionSettingsHint:
+    'Правила добавляются в rules: основного конфига. API меняет только память; запись на диск — в dev/preview. Из UI ядра используйте скачанный файл.',
+  ruleInjectionConfigPath: 'Абсолютный путь к основному конфигу',
+  ruleInjectionConfigPathPlaceholder: 'например /home/user/mih/Clash配置.yaml',
+  ruleInjectionPersistToDisk: 'Записать YAML на диск (только dev/preview)',
   configFilePath: 'Путь к файлу конфигурации',
   configFilePathPlaceholder: 'Абсолютный путь, например /etc/mihomo/config.yaml',
   configPayload: 'Содержимое конфигурации',

@@ -15,6 +15,7 @@
     "dev": "vite",
     "format": "prettier --write src/",
     "lint": "eslint . --fix",
+    "persist-injection": "node scripts/persist-injection.mjs",
     "prepare": "husky",
     "preview": "vite preview",
     "type-check": "vue-tsc --build --force"

@@ -121,6 +121,8 @@
           <DnsQuery />
         </div>
       </div>
+
+      <RuleInjectionSettings v-if="!isSingBox" />
     </div>
 
     <div
@@ -213,6 +215,7 @@ import BackendVersion from '@/components/common/BackendVersion.vue'
 import BackendPortsGrid from '@/components/settings/backend/BackendPortsGrid.vue'
 import BackendSwitch from '@/components/settings/backend/BackendSwitch.vue'
 import DnsQuery from '@/components/settings/backend/DnsQuery.vue'
+import RuleInjectionSettings from '@/components/settings/backend/RuleInjectionSettings.vue'
 import { useIsSettingVisible } from '@/composables/settings'
 import { BACKEND_ITEM_KEYS } from '@/config/settingsItems'
 import { MIHOMO, MIHOMO_CHANNEL } from '@/constant'

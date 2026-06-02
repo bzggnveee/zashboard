@@ -81,9 +81,21 @@ const en = {
   updateConfigs: 'Update configs',
   updateConfigsSuccess: 'Configs updated successfully',
   ruleInjectionSuccess: 'Injected {rules} rules into config',
+  ruleInjectionSuccessPersisted:
+    'Injected {rules} rules: core updated and saved to {path}. Do not use Reload configs before saving.',
+  ruleInjectionSuccessDownload:
+    'Injected {rules} rules into core (memory). Disk YAML unchanged; downloaded {path} — replace your main config file.',
+  ruleInjectionVerifyFailed:
+    'Config was sent but inline rules were not found in the core. Ensure PUT /configs is allowed and you did not Reload configs right after injection.',
   ruleInjectionNoData:
     'No rules to inject (config: {hasClashConfig}, userProxy: {userProxyCount}, AWAvenue: {awAvenueCount}). Update injection/ and rebuild the dashboard.',
   ruleInjectionFailed: 'Rule injection failed: {message}',
+  ruleInjectionSettings: 'Rule injection',
+  ruleInjectionSettingsHint:
+    'Rules are merged into the main config rules: section (not rule_providers files). API updates memory only; dev/preview dashboard can write disk. When opened from core UI, use the downloaded file to overwrite Clash config.',
+  ruleInjectionConfigPath: 'Main config absolute path (disk write)',
+  ruleInjectionConfigPathPlaceholder: 'e.g. /home/user/mih/Clash配置.yaml',
+  ruleInjectionPersistToDisk: 'Write injected YAML to disk (dev/preview only)',
   configFilePath: 'Config file path',
   configFilePathPlaceholder: 'Absolute path, e.g. /etc/mihomo/config.yaml',
   configPayload: 'Config content',

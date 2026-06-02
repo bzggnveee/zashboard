@@ -83,9 +83,21 @@ const zh: LANG_MESSAGE = {
   updateConfigs: '更新配置',
   updateConfigsSuccess: '配置更新成功',
   ruleInjectionSuccess: '已向配置注入 {rules} 条规则',
+  ruleInjectionSuccessPersisted:
+    '已注入 {rules} 条规则：内核已加载，并写入 {path}。请勿在未保存前点击「重载配置」。',
+  ruleInjectionSuccessDownload:
+    '已注入 {rules} 条规则到内核（内存）。磁盘 YAML 未自动修改，已下载 {path}，请覆盖保存到主配置文件。',
+  ruleInjectionVerifyFailed:
+    '已提交配置，但内核规则列表中未检测到注入项。请确认 mihomo 允许 PUT /configs，且未在注入后立刻「重载配置」。',
   ruleInjectionNoData:
     '未找到可注入规则（主配置: {hasClashConfig}，userProxy: {userProxyCount} 条，AWAvenue: {awAvenueCount} 条）。请更新 injection/ 目录后重新构建面板。',
   ruleInjectionFailed: '规则注入失败：{message}',
+  ruleInjectionSettings: '规则注入',
+  ruleInjectionSettingsHint:
+    '注入写入主配置 rules: 段（非 rule_providers 文件）。mihomo API 默认只改内存；通过 pnpm dev 访问面板时可写回磁盘。从内核 UI 打开时请用下载的文件覆盖 Clash配置.yaml。',
+  ruleInjectionConfigPath: '主配置绝对路径（写回磁盘）',
+  ruleInjectionConfigPathPlaceholder: '例如 /home/user/mih/Clash配置.yaml',
+  ruleInjectionPersistToDisk: '注入后写回磁盘（仅 dev/preview 面板）',
   configFilePath: '配置文件路径',
   configFilePathPlaceholder: '绝对路径，例如 /etc/mihomo/config.yaml',
   configPayload: '配置内容',
