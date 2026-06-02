@@ -82,7 +82,10 @@ const zhTW: LANG_MESSAGE = {
   reloadConfigs: '重載配置',
   updateConfigs: '更新配置',
   updateConfigsSuccess: '配置更新成功',
-  ruleInjectionSuccess: '規則已注入到配置',
+  ruleInjectionSuccess: '已向配置注入 {rules} 條規則',
+  ruleInjectionNoData:
+    '未找到可注入規則（主配置: {hasClashConfig}，userProxy: {userProxyCount} 條，AWAvenue: {awAvenueCount} 條）。請更新 injection/ 目錄後重新構建面板。',
+  ruleInjectionFailed: '規則注入失敗：{message}',
   configFilePath: '配置檔案路徑',
   configFilePathPlaceholder: '絕對路徑，例如 /etc/mihomo/config.yaml',
   configPayload: '配置內容',

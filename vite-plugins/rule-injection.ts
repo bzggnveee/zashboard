@@ -6,15 +6,35 @@ const VIRTUAL_ID = 'virtual:rule-injection-data'
 const RESOLVED_ID = '\0' + VIRTUAL_ID
 
 export interface RuleInjectionOptions {
-  clashConfigPath: string
-  userProxyPath: string
-  awAvenuePath: string
+  /** Project root (zashboard directory). */
+  rootDir: string
 }
 
-const readOr = (p: string): string => (existsSync(p) ? readFileSync(p, 'utf-8') : '')
+const readFirst = (candidates: string[]): string => {
+  for (const p of candidates) {
+    const abs = resolve(p)
+    if (existsSync(abs)) return readFileSync(abs, 'utf-8')
+  }
+  return ''
+}
 
 export function ruleInjectionPlugin(opts: RuleInjectionOptions): Plugin {
-  const paths = [opts.clashConfigPath, opts.userProxyPath, opts.awAvenuePath].map((p) => resolve(p))
+  const root = resolve(opts.rootDir)
+  const clashCandidates = [
+    resolve(root, 'injection/Clash配置.yaml'),
+    resolve(root, '../Clash配置.yaml'),
+  ]
+  const userProxyCandidates = [
+    resolve(root, 'injection/rule_providers/userProxy.yaml'),
+    resolve(root, '../rule_providers/userProxy.yaml'),
+  ]
+  const awAvenueCandidates = [
+    resolve(root, 'injection/rule_providers/AWAvenue-Ads-Rule-Clash.yaml'),
+    resolve(root, '../rule_providers/AWAvenue-Ads-Rule-Clash.yaml'),
+  ]
+  const watchPaths = [...clashCandidates, ...userProxyCandidates, ...awAvenueCandidates].filter(
+    (p) => existsSync(p),
+  )
 
   return {
     name: 'rule-injection-data',
@@ -24,7 +44,9 @@ export function ruleInjectionPlugin(opts: RuleInjectionOptions): Plugin {
     },
     load(id) {
       if (id !== RESOLVED_ID) return null
-      const [clashConfig, userProxy, awAvenue] = paths.map(readOr)
+      const clashConfig = readFirst(clashCandidates)
+      const userProxy = readFirst(userProxyCandidates)
+      const awAvenue = readFirst(awAvenueCandidates)
       return [
         `export const clashConfigText = ${JSON.stringify(clashConfig)};`,
         `export const userProxyYaml = ${JSON.stringify(userProxy)};`,
@@ -32,11 +54,9 @@ export function ruleInjectionPlugin(opts: RuleInjectionOptions): Plugin {
       ].join('\n')
     },
     configureServer(server) {
-      paths.forEach((p) => {
-        if (existsSync(p)) server.watcher.add(p)
-      })
+      watchPaths.forEach((p) => server.watcher.add(p))
       const onChange = (changed: string) => {
-        if (!paths.includes(resolve(changed))) return
+        if (!watchPaths.includes(resolve(changed))) return
         const mod = server.moduleGraph.getModuleById(RESOLVED_ID)
         if (mod) {
           server.moduleGraph.invalidateModule(mod)

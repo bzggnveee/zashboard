@@ -166,5 +166,21 @@ export const buildInjectedConfig = (): string => {
   return merged.join('\n') + (hadTrailingNewline ? '\n' : '')
 }
 
-export const hasInjectionData = (): boolean =>
-  Boolean(clashConfigText) && Boolean(userProxyYaml || awAvenueYaml)
+export const getInjectionDataStatus = () => {
+  const userProxyRules = extractRulesFromProvider(userProxyYaml, 'userProxy')
+  const awAvenueRules = extractRulesFromProvider(awAvenueYaml, 'awAvenue')
+  return {
+    clashConfig: clashConfigText,
+    hasClashConfig: Boolean(clashConfigText),
+    hasUserProxy: Boolean(userProxyYaml),
+    hasAwAvenue: Boolean(awAvenueYaml),
+    userProxyCount: userProxyRules.length,
+    awAvenueCount: awAvenueRules.length,
+    ruleCount: userProxyRules.length + awAvenueRules.length,
+  }
+}
+
+export const hasInjectionData = (): boolean => {
+  const { hasClashConfig, userProxyCount, awAvenueCount } = getInjectionDataStatus()
+  return hasClashConfig && userProxyCount + awAvenueCount > 0
+}

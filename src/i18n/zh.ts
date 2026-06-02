@@ -82,7 +82,10 @@ const zh: LANG_MESSAGE = {
   reloadConfigs: '重载配置',
   updateConfigs: '更新配置',
   updateConfigsSuccess: '配置更新成功',
-  ruleInjectionSuccess: '规则已注入到配置',
+  ruleInjectionSuccess: '已向配置注入 {rules} 条规则',
+  ruleInjectionNoData:
+    '未找到可注入规则（主配置: {hasClashConfig}，userProxy: {userProxyCount} 条，AWAvenue: {awAvenueCount} 条）。请更新 injection/ 目录后重新构建面板。',
+  ruleInjectionFailed: '规则注入失败：{message}',
   configFilePath: '配置文件路径',
   configFilePathPlaceholder: '绝对路径，例如 /etc/mihomo/config.yaml',
   configPayload: '配置内容',

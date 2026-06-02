@@ -82,7 +82,10 @@ const ru: LANG_MESSAGE = {
   reloadConfigs: 'Перезагрузить конфигурации',
   updateConfigs: 'Обновить конфигурации',
   updateConfigsSuccess: 'Конфигурации успешно обновлены',
-  ruleInjectionSuccess: 'Правила внедрены в конфигурацию',
+  ruleInjectionSuccess: 'В конфигурацию внедрено правил: {rules}',
+  ruleInjectionNoData:
+    'Нет правил для внедрения (config: {hasClashConfig}, userProxy: {userProxyCount}, AWAvenue: {awAvenueCount}). Обновите injection/ и пересоберите панель.',
+  ruleInjectionFailed: 'Ошибка внедрения правил: {message}',
   configFilePath: 'Путь к файлу конфигурации',
   configFilePathPlaceholder: 'Абсолютный путь, например /etc/mihomo/config.yaml',
   configPayload: 'Содержимое конфигурации',

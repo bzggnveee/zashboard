@@ -80,7 +80,10 @@ const en = {
   reloadConfigs: 'Reload configs',
   updateConfigs: 'Update configs',
   updateConfigsSuccess: 'Configs updated successfully',
-  ruleInjectionSuccess: 'Rules injected into config',
+  ruleInjectionSuccess: 'Injected {rules} rules into config',
+  ruleInjectionNoData:
+    'No rules to inject (config: {hasClashConfig}, userProxy: {userProxyCount}, AWAvenue: {awAvenueCount}). Update injection/ and rebuild the dashboard.',
+  ruleInjectionFailed: 'Rule injection failed: {message}',
   configFilePath: 'Config file path',
   configFilePathPlaceholder: 'Absolute path, e.g. /etc/mihomo/config.yaml',
   configPayload: 'Config content',
