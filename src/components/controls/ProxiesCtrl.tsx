@@ -3,6 +3,7 @@ import { renderProxiesPageItems } from '@/composables/proxies'
 import { isProxyNodeSearchMode, toggleProxySearchMode } from '@/composables/proxySearch'
 import { useCtrlsBar } from '@/composables/useCtrlsBar'
 import { PROXY_SORT_TYPE, PROXY_TAB_TYPE, ROUTE_NAME, SETTINGS_MENU_KEY } from '@/constant'
+import { runRuleInjection } from '@/helper/runRuleInjection'
 import { getMinCardWidth } from '@/helper/utils'
 import { configs, updateConfigs } from '@/store/config'
 import { activeConnections } from '@/store/connections'
@@ -63,6 +64,7 @@ export default defineComponent({
           proxyProviederList.value.map((provider) => updateProxyProviderAPI(provider.name)),
         )
         await fetchProxies()
+        await runRuleInjection()
         isUpgrading.value = false
       } catch {
         await fetchProxies()

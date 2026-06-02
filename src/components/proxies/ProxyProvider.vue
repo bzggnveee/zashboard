@@ -71,6 +71,7 @@
 import { proxyProviderHealthCheckAPI, updateProxyProviderAPI } from '@/api'
 import { useBounceOnVisible } from '@/composables/bouncein'
 import { useRenderProxyList } from '@/composables/renderProxies'
+import { runRuleInjection } from '@/helper/runRuleInjection'
 import { fromNow, prettyBytesHelper } from '@/helper/utils'
 import { fetchProxies, proxyProviederList } from '@/store/proxies'
 import { ArrowPathIcon, BoltIcon } from '@heroicons/vue/24/outline'
@@ -156,6 +157,7 @@ const updateProviderClickHandler = async () => {
   try {
     await updateProxyProviderAPI(props.name)
     await fetchProxies()
+    await runRuleInjection()
     isUpdating.value = false
   } catch {
     isUpdating.value = false

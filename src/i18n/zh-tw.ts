@@ -82,6 +82,7 @@ const zhTW: LANG_MESSAGE = {
   reloadConfigs: '重載配置',
   updateConfigs: '更新配置',
   updateConfigsSuccess: '配置更新成功',
+  ruleInjectionSuccess: '規則已注入到配置',
   configFilePath: '配置檔案路徑',
   configFilePathPlaceholder: '絕對路徑，例如 /etc/mihomo/config.yaml',
   configPayload: '配置內容',

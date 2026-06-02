@@ -80,6 +80,7 @@ const en = {
   reloadConfigs: 'Reload configs',
   updateConfigs: 'Update configs',
   updateConfigsSuccess: 'Configs updated successfully',
+  ruleInjectionSuccess: 'Rules injected into config',
   configFilePath: 'Config file path',
   configFilePathPlaceholder: 'Absolute path, e.g. /etc/mihomo/config.yaml',
   configPayload: 'Config content',

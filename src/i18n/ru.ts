@@ -82,6 +82,7 @@ const ru: LANG_MESSAGE = {
   reloadConfigs: 'Перезагрузить конфигурации',
   updateConfigs: 'Обновить конфигурации',
   updateConfigsSuccess: 'Конфигурации успешно обновлены',
+  ruleInjectionSuccess: 'Правила внедрены в конфигурацию',
   configFilePath: 'Путь к файлу конфигурации',
   configFilePathPlaceholder: 'Абсолютный путь, например /etc/mihomo/config.yaml',
   configPayload: 'Содержимое конфигурации',

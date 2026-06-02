@@ -5,6 +5,7 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import { version } from './package.json'
+import { ruleInjectionPlugin } from './vite-plugins/rule-injection'
 
 const getGitCommitId = (): string => {
   try {
@@ -31,6 +32,13 @@ export default defineConfig({
   plugins: [
     vue(),
     vueJsx(),
+    ruleInjectionPlugin({
+      clashConfigPath: fileURLToPath(new URL('../Clash配置.yaml', import.meta.url)),
+      userProxyPath: fileURLToPath(new URL('../rule_providers/userProxy.yaml', import.meta.url)),
+      awAvenuePath: fileURLToPath(
+        new URL('../rule_providers/AWAvenue-Ads-Rule-Clash.yaml', import.meta.url),
+      ),
+    }),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'favicon-dark.svg'],

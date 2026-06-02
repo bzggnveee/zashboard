@@ -82,6 +82,7 @@ const zh: LANG_MESSAGE = {
   reloadConfigs: '重载配置',
   updateConfigs: '更新配置',
   updateConfigsSuccess: '配置更新成功',
+  ruleInjectionSuccess: '规则已注入到配置',
   configFilePath: '配置文件路径',
   configFilePathPlaceholder: '绝对路径，例如 /etc/mihomo/config.yaml',
   configPayload: '配置内容',
