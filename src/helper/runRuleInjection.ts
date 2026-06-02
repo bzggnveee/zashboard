@@ -1,24 +1,31 @@
-import { updateConfigsAPI } from '@/api'
+import { reloadConfigsAPI, updateConfigsAPI } from '@/api'
 import { downloadTextFile } from '@/helper/downloadText'
 import { showNotification } from '@/helper/notification'
 import {
   buildInjectedConfig,
+  clashSourcePath,
   getInjectionDataStatus,
   hasInjectionData,
 } from '@/helper/ruleInjection'
-import { ruleInjectionConfigPath, ruleInjectionPersistToDisk } from '@/helper/ruleInjectionSettings'
 import { verifyInjectionInCore } from '@/helper/ruleInjectionVerify'
 import { fetchConfigs } from '@/store/config'
 import { fetchRules } from '@/store/rules'
 
 let isRunning = false
 
-const persistInjectedConfigToDisk = async (payload: string): Promise<string | null> => {
+/** Vite dev/preview middleware path (same origin as dashboard). */
+const PERSIST_INJECTION_PATH = '/__zashboard/persist-injection'
+
+/**
+ * Try to write the injected config to disk via the Vite dev/preview middleware.
+ * The middleware writes back to the same file it originally read from.
+ */
+const persistViaMiddleware = async (payload: string): Promise<string | null> => {
   if (typeof window === 'undefined') return null
   try {
     const headers: Record<string, string> = { 'Content-Type': 'text/yaml;charset=utf-8' }
-    if (ruleInjectionConfigPath.value.trim()) {
-      headers['X-Config-Path'] = ruleInjectionConfigPath.value.trim()
+    if (clashSourcePath) {
+      headers['X-Source-Path'] = clashSourcePath
     }
     const res = await fetch(PERSIST_INJECTION_PATH, {
       method: 'POST',
@@ -32,9 +39,6 @@ const persistInjectedConfigToDisk = async (payload: string): Promise<string | nu
     return null
   }
 }
-
-/** Vite dev/preview middleware path (same origin as dashboard). */
-const PERSIST_INJECTION_PATH = '/__zashboard/persist-injection'
 
 export const runRuleInjection = async (): Promise<boolean> => {
   if (isRunning) return false
@@ -69,6 +73,7 @@ export const runRuleInjection = async (): Promise<boolean> => {
       return false
     }
 
+    // Step 1: Push injected config to mihomo in-memory
     await updateConfigsAPI({ payload }, true)
     await Promise.all([fetchConfigs(), fetchRules()])
 
@@ -81,11 +86,20 @@ export const runRuleInjection = async (): Promise<boolean> => {
       return false
     }
 
-    let savedPath: string | null = null
-    if (ruleInjectionPersistToDisk.value) {
-      savedPath = await persistInjectedConfigToDisk(payload)
+    // Step 2: Always try to persist to disk via middleware (writes to ../Clash配置.yaml)
+    const savedPath: string | null = await persistViaMiddleware(payload)
+
+    // Step 3: If middleware wrote to disk, reload mihomo from disk so the config sticks
+    if (savedPath) {
+      try {
+        await reloadConfigsAPI()
+        await Promise.all([fetchConfigs(), fetchRules()])
+      } catch {
+        // reload failed, in-memory config is still active
+      }
     }
 
+    // Step 4: If no middleware (production build), download file for manual replacement
     if (!savedPath) {
       downloadTextFile('Clash配置-injected.yaml', payload)
     }
@@ -94,7 +108,7 @@ export const runRuleInjection = async (): Promise<boolean> => {
       content: savedPath ? 'ruleInjectionSuccessPersisted' : 'ruleInjectionSuccessDownload',
       params: {
         rules: String(status.ruleCount),
-        path: savedPath || ruleInjectionConfigPath.value || 'Clash配置-injected.yaml',
+        path: savedPath || 'Clash配置-injected.yaml',
       },
       type: 'alert-success',
       timeout: 6000,

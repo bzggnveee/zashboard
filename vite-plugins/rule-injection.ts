@@ -11,12 +11,12 @@ export interface RuleInjectionOptions {
   rootDir: string
 }
 
-const readFirst = (candidates: string[]): string => {
+const readFirst = (candidates: string[]): { path: string; content: string } | null => {
   for (const p of candidates) {
     const abs = resolve(p)
-    if (existsSync(abs)) return readFileSync(abs, 'utf-8')
+    if (existsSync(abs)) return { path: abs, content: readFileSync(abs, 'utf-8') }
   }
-  return ''
+  return null
 }
 
 const readBody = (req: Connect.IncomingMessage): Promise<string> =>
@@ -30,7 +30,7 @@ const readBody = (req: Connect.IncomingMessage): Promise<string> =>
 const attachPersistMiddleware = (
   middlewares: Connect.Server,
   root: string,
-  clashCandidates: string[],
+  clashSourcePath: string | null,
 ) => {
   middlewares.use(PERSIST_PATH, async (req, res, next) => {
     if (req.method !== 'POST') {
@@ -40,23 +40,29 @@ const attachPersistMiddleware = (
 
     try {
       const body = await readBody(req)
-      const headerPath = req.headers['x-config-path']
-      const customPath =
-        typeof headerPath === 'string' && headerPath.trim() ? resolve(headerPath.trim()) : ''
 
-      const targets = [
-        ...(customPath ? [customPath] : []),
-        ...clashCandidates,
+      // Honor X-Source-Path header (baked at build time) as highest priority
+      const headerSource = req.headers['x-source-path']
+      const sourcePath =
+        typeof headerSource === 'string' && headerSource.trim()
+          ? resolve(headerSource.trim())
+          : null
+
+      // Write to ALL applicable targets (source + parent config)
+      const mainConfigPath = resolve(root, '../Clash配置.yaml')
+      const candidates = [
+        ...(sourcePath ? [sourcePath] : []),
+        ...(clashSourcePath && clashSourcePath !== sourcePath ? [clashSourcePath] : []),
+        mainConfigPath,
         resolve(root, 'injection/Clash配置.yaml'),
       ]
 
       let writtenPath = ''
-      for (const target of targets) {
+      for (const target of candidates) {
         try {
           mkdirSync(dirname(target), { recursive: true })
           writeFileSync(target, body, 'utf-8')
-          writtenPath = target
-          break
+          if (!writtenPath) writtenPath = target
         } catch {
           // try next candidate
         }
@@ -99,12 +105,18 @@ export function ruleInjectionPlugin(opts: RuleInjectionOptions): Plugin {
     resolve(root, 'injection/rule_providers/AWAvenue-Ads-Rule-Clash.yaml'),
     resolve(root, '../rule_providers/AWAvenue-Ads-Rule-Clash.yaml'),
   ]
-  const watchPaths = [...clashCandidates, ...userProxyCandidates, ...awAvenueCandidates].filter(
-    (p) => existsSync(p),
-  )
+  const clashResult = readFirst(clashCandidates)
+  const clashSourcePath = clashResult?.path ?? null
+  const userProxyResult = readFirst(userProxyCandidates)
+  const awAvenueResult = readFirst(awAvenueCandidates)
+  const watchPaths = [
+    ...(clashSourcePath ? [clashSourcePath] : []),
+    ...userProxyCandidates,
+    ...awAvenueCandidates,
+  ].filter((p) => existsSync(p))
 
   const setupPersist = (server: { middlewares: Connect.Server }) => {
-    attachPersistMiddleware(server.middlewares, root, clashCandidates)
+    attachPersistMiddleware(server.middlewares, root, clashSourcePath)
   }
 
   return {
@@ -115,11 +127,12 @@ export function ruleInjectionPlugin(opts: RuleInjectionOptions): Plugin {
     },
     load(id) {
       if (id !== RESOLVED_ID) return null
-      const clashConfig = readFirst(clashCandidates)
-      const userProxy = readFirst(userProxyCandidates)
-      const awAvenue = readFirst(awAvenueCandidates)
+      const clashConfig = clashResult?.content ?? ''
+      const userProxy = userProxyResult?.content ?? ''
+      const awAvenue = awAvenueResult?.content ?? ''
       return [
         `export const clashConfigText = ${JSON.stringify(clashConfig)};`,
+        `export const clashSourcePath = ${JSON.stringify(clashSourcePath)};`,
         `export const userProxyYaml = ${JSON.stringify(userProxy)};`,
         `export const awAvenueYaml = ${JSON.stringify(awAvenue)};`,
       ].join('\n')

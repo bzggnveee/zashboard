@@ -1,4 +1,11 @@
-import { awAvenueYaml, clashConfigText, userProxyYaml } from 'virtual:rule-injection-data'
+import {
+  awAvenueYaml,
+  clashConfigText,
+  clashSourcePath,
+  userProxyYaml,
+} from 'virtual:rule-injection-data'
+
+export { clashSourcePath }
 
 const KNOWN_FLAGS = new Set(['no-resolve', 'src'])
 

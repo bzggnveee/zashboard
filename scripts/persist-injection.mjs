@@ -12,9 +12,9 @@ const root = resolve(fileURLToPath(new URL('..', import.meta.url)))
 const readFirst = (paths) => {
   for (const p of paths) {
     const abs = resolve(p)
-    if (existsSync(abs)) return readFileSync(abs, 'utf-8')
+    if (existsSync(abs)) return { path: abs, content: readFileSync(abs, 'utf-8') }
   }
-  return ''
+  return null
 }
 
 // Inline minimal injection (keep in sync with src/helper/ruleInjection.ts)
@@ -97,18 +97,24 @@ const findInjectionPoint = (lines, block) => {
   return injectAt
 }
 
-const clashConfigText = readFirst([
+const clashResult = readFirst([
   resolve(root, 'injection/Clash配置.yaml'),
   resolve(root, '../Clash配置.yaml'),
 ])
-const userProxyYaml = readFirst([
+const clashConfigText = clashResult?.content ?? ''
+const clashSourcePath = clashResult?.path ?? null
+
+const userProxyResult = readFirst([
   resolve(root, 'injection/rule_providers/userProxy.yaml'),
   resolve(root, '../rule_providers/userProxy.yaml'),
 ])
-const awAvenueYaml = readFirst([
+const userProxyYaml = userProxyResult?.content ?? ''
+
+const awAvenueResult = readFirst([
   resolve(root, 'injection/rule_providers/AWAvenue-Ads-Rule-Clash.yaml'),
   resolve(root, '../rule_providers/AWAvenue-Ads-Rule-Clash.yaml'),
 ])
+const awAvenueYaml = awAvenueResult?.content ?? ''
 
 if (!clashConfigText) {
   console.error('Missing Clash配置.yaml in injection/ or parent directory')
@@ -138,8 +144,15 @@ const injected = [
 const merged = [...stripped.slice(0, injectAt), ...injected, ...stripped.slice(injectAt)]
 const result = merged.join('\n') + (hadTrailingNewline ? '\n' : '')
 
-const outPath = resolve(process.argv[2] || resolve(root, '../Clash配置.yaml'))
+// Write back to the source file, plus the parent config (mihomo's actual config)
+const mainConfigPath = resolve(root, '../Clash配置.yaml')
+const outPath = resolve(process.argv[2] || clashSourcePath || mainConfigPath)
 mkdirSync(dirname(outPath), { recursive: true })
 writeFileSync(outPath, result, 'utf-8')
-writeFileSync(resolve(root, 'injection/Clash配置.yaml'), result, 'utf-8')
-console.log(`Wrote ${rules.length} injected rules to:\n  ${outPath}\n  ${resolve(root, 'injection/Clash配置.yaml')}`)
+const written = [outPath]
+if (resolve(outPath) !== resolve(mainConfigPath)) {
+  mkdirSync(dirname(mainConfigPath), { recursive: true })
+  writeFileSync(mainConfigPath, result, 'utf-8')
+  written.push(mainConfigPath)
+}
+console.log(`Wrote ${rules.length} injected rules to:\n  ${written.join('\n  ')}`)
